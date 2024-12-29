@@ -1,0 +1,408 @@
+<html>
+<head>
+<title>Main.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #1750eb;}
+.s3 { color: #067d17;}
+.s4 { color: #0037a6;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Main.java</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">javax.swing.*;</span>
+<span class="s0">import </span><span class="s1">javax.swing.border.EmptyBorder;</span>
+<span class="s0">import </span><span class="s1">java.awt.*;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.ActionEvent;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.ActionListener;</span>
+<span class="s0">import </span><span class="s1">java.io.*;</span>
+<span class="s0">import </span><span class="s1">java.util.ArrayList;</span>
+<span class="s0">import </span><span class="s1">java.util.HashMap;</span>
+<span class="s0">import </span><span class="s1">java.util.List;</span>
+<span class="s0">import </span><span class="s1">java.util.Map;</span>
+<span class="s0">import </span><span class="s1">java.util.Random;</span>
+
+<span class="s0">public class </span><span class="s1">Main {</span>
+    <span class="s0">public static void </span><span class="s1">main(String[] args) {</span>
+        <span class="s1">SwingUtilities.invokeLater(SilvesterTrinkspiel::</span><span class="s0">new</span><span class="s1">);</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+
+<span class="s0">class </span><span class="s1">SilvesterTrinkspiel {</span>
+    <span class="s0">private </span><span class="s1">JFrame frame;</span>
+    <span class="s0">private </span><span class="s1">ArrayList&lt;String&gt; players = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;();</span>
+    <span class="s0">private </span><span class="s1">ArrayList&lt;String&gt; teams = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;();</span>
+    <span class="s0">private </span><span class="s1">Map&lt;String, Integer&gt; teamPoints = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;();</span>
+    <span class="s0">private </span><span class="s1">Map&lt;String, Integer&gt; playerPoints = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;();</span>
+    <span class="s0">private </span><span class="s1">Map&lt;String, List&lt;Question&gt;&gt; categoryQuestions = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;();</span>
+    <span class="s0">private int </span><span class="s1">currentPlayerIndex = </span><span class="s2">0</span><span class="s1">;</span>
+
+    <span class="s0">public </span><span class="s1">SilvesterTrinkspiel() {</span>
+        <span class="s1">initialize();</span>
+        <span class="s1">loadQuestionsFromTextFile(</span><span class="s3">&quot;src/Trinkspiel_Silvester.txt&quot;</span><span class="s1">);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">loadQuestionsFromTextFile(String filePath) {</span>
+        <span class="s0">try </span><span class="s1">(BufferedReader reader = </span><span class="s0">new </span><span class="s1">BufferedReader(</span><span class="s0">new </span><span class="s1">FileReader(filePath))) {</span>
+            <span class="s1">String line;</span>
+            <span class="s0">while </span><span class="s1">((line = reader.readLine()) != </span><span class="s0">null</span><span class="s1">) {</span>
+                <span class="s1">String[] parts = line.split(</span><span class="s3">&quot;;&quot;</span><span class="s1">);</span>
+                <span class="s0">if </span><span class="s1">(parts.length &gt;= </span><span class="s2">3</span><span class="s1">) {</span>
+                    <span class="s1">String category = parts[</span><span class="s2">0</span><span class="s1">].trim();</span>
+                    <span class="s1">String question = parts[</span><span class="s2">1</span><span class="s1">].trim();</span>
+                    <span class="s1">String answer = parts[</span><span class="s2">2</span><span class="s1">].trim();</span>
+
+                    <span class="s1">categoryQuestions.computeIfAbsent(category, k -&gt; </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()).add(</span><span class="s0">new </span><span class="s1">Question(question, answer));</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e) {</span>
+            <span class="s1">e.printStackTrace();</span>
+            <span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null</span><span class="s1">, </span><span class="s3">&quot;Fehler beim Laden der Textdatei: &quot; </span><span class="s1">+ e.getMessage());</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">initialize() {</span>
+        <span class="s1">frame = </span><span class="s0">new </span><span class="s1">JFrame(</span><span class="s3">&quot;Silvester Trinkspiel&quot;</span><span class="s1">);</span>
+        <span class="s1">frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+        <span class="s1">frame.setSize(</span><span class="s2">900</span><span class="s1">, </span><span class="s2">700</span><span class="s1">);</span>
+        <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">BorderLayout());</span>
+
+        <span class="s1">showOpeningSequence();</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">showOpeningSequence() {</span>
+        <span class="s1">JPanel panel = </span><span class="s0">new </span><span class="s1">JPanel() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">protected void </span><span class="s1">paintComponent(Graphics g) {</span>
+                <span class="s0">super</span><span class="s1">.paintComponent(g);</span>
+                <span class="s1">Graphics2D g2d = (Graphics2D) g;</span>
+                <span class="s1">GradientPaint gradient = </span><span class="s0">new </span><span class="s1">GradientPaint(</span><span class="s2">0</span><span class="s1">, </span><span class="s2">0</span><span class="s1">, Color.DARK_GRAY, getWidth(), getHeight(), Color.BLACK);</span>
+                <span class="s1">g2d.setPaint(gradient);</span>
+                <span class="s1">g2d.fillRect(</span><span class="s2">0</span><span class="s1">, </span><span class="s2">0</span><span class="s1">, getWidth(), getHeight());</span>
+            <span class="s1">}</span>
+        <span class="s1">};</span>
+        <span class="s1">panel.setLayout(</span><span class="s0">new </span><span class="s1">BorderLayout());</span>
+        <span class="s1">frame.add(panel);</span>
+
+        <span class="s1">JLabel titleLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;2025&quot;</span><span class="s1">, JLabel.CENTER);</span>
+        <span class="s1">titleLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">150</span><span class="s1">));</span>
+        <span class="s1">titleLabel.setForeground(Color.ORANGE);</span>
+        <span class="s1">titleLabel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">50</span><span class="s1">, </span><span class="s2">0</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">0</span><span class="s1">));</span>
+        <span class="s1">panel.add(titleLabel, BorderLayout.NORTH);</span>
+
+        <span class="s1">JTextArea scrollingText = </span><span class="s0">new </span><span class="s1">JTextArea();</span>
+        <span class="s1">scrollingText.setEditable(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">scrollingText.setBackground(Color.BLACK);</span>
+        <span class="s1">scrollingText.setForeground(Color.LIGHT_GRAY);</span>
+        <span class="s1">scrollingText.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.PLAIN, </span><span class="s2">24</span><span class="s1">));</span>
+        <span class="s1">scrollingText.setWrapStyleWord(</span><span class="s0">true</span><span class="s1">);</span>
+        <span class="s1">scrollingText.setLineWrap(</span><span class="s0">true</span><span class="s1">);</span>
+        <span class="s1">scrollingText.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">50</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">50</span><span class="s1">));</span>
+        <span class="s1">JScrollPane scrollPane = </span><span class="s0">new </span><span class="s1">JScrollPane(scrollingText);</span>
+        <span class="s1">scrollPane.setBorder(</span><span class="s0">null</span><span class="s1">);</span>
+        <span class="s1">panel.add(scrollPane, BorderLayout.CENTER);</span>
+
+        <span class="s1">JLabel presentedByLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Presented by Ozan &amp; ChatGPT&quot;</span><span class="s1">, JLabel.CENTER);</span>
+        <span class="s1">presentedByLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">presentedByLabel.setForeground(Color.LIGHT_GRAY);</span>
+        <span class="s1">presentedByLabel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">0</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">0</span><span class="s1">));</span>
+        <span class="s1">panel.add(presentedByLabel, BorderLayout.SOUTH);</span>
+
+        <span class="s1">String text = </span><span class="s3">&quot;Es sind fast 1500 Tage vergangen, seit unsere Reise begann. </span><span class="s4">\n</span><span class="s3">&quot; </span><span class="s1">+</span>
+                <span class="s3">&quot;Seitdem haben wir die Wüsten Dubais unsicher gemacht, die Strände der Türkei erobert, </span><span class="s4">\n</span><span class="s3">&quot; </span><span class="s1">+</span>
+                <span class="s3">&quot;durch die Grachten Amsterdams geschippert – und das alles meistens mit einem Glas in der Hand und mit 1,8 Promille.</span><span class="s4">\n\n</span><span class="s3">&quot; </span><span class="s1">+</span>
+                <span class="s3">&quot;Wir haben viel gelacht, noch mehr getrunken und so manche Nacht unvergesslich gemacht. </span><span class="s4">\n</span><span class="s3">&quot; </span><span class="s1">+</span>
+                <span class="s3">&quot;Heute, an Silvester, stoßen wir nicht nur auf das neue Jahr an, sondern auf uns – </span><span class="s4">\n</span><span class="s3">&quot; </span><span class="s1">+</span>
+                <span class="s3">&quot;auf Freundschaft, Geschichten und darauf, dass das Glas nie leer wird!&quot;</span><span class="s1">;</span>
+
+        <span class="s1">String[] lines = text.split(</span><span class="s3">&quot;</span><span class="s4">\\</span><span class="s3">n&quot;</span><span class="s1">);</span>
+        <span class="s1">Timer textTimer = </span><span class="s0">new </span><span class="s1">Timer(</span><span class="s2">1000</span><span class="s1">, </span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s0">int </span><span class="s1">lineIndex = </span><span class="s2">0</span><span class="s1">;</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s0">if </span><span class="s1">(lineIndex &lt; lines.length) {</span>
+                    <span class="s1">scrollingText.append(lines[lineIndex] + </span><span class="s3">&quot;</span><span class="s4">\n</span><span class="s3">&quot;</span><span class="s1">);</span>
+                    <span class="s1">scrollingText.setCaretPosition(scrollingText.getDocument().getLength());</span>
+                    <span class="s1">lineIndex++;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">((Timer) e.getSource()).stop();</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+        <span class="s1">textTimer.start();</span>
+
+        <span class="s1">JButton weiterButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Weiter&quot;</span><span class="s1">);</span>
+        <span class="s1">weiterButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">weiterButton.setBackground(Color.ORANGE);</span>
+        <span class="s1">weiterButton.setForeground(Color.BLACK);</span>
+        <span class="s1">weiterButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">weiterButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">weiterButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s1">frame.dispose();</span>
+                <span class="s1">openTeamSelection();</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+        <span class="s1">JPanel buttonPanel = </span><span class="s0">new </span><span class="s1">JPanel();</span>
+        <span class="s1">buttonPanel.setBackground(Color.BLACK);</span>
+        <span class="s1">buttonPanel.add(weiterButton);</span>
+        <span class="s1">panel.add(buttonPanel, BorderLayout.EAST);</span>
+
+        <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">openTeamSelection() {</span>
+        <span class="s1">JFrame teamFrame = </span><span class="s0">new </span><span class="s1">JFrame(</span><span class="s3">&quot;Teams erstellen&quot;</span><span class="s1">);</span>
+        <span class="s1">teamFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+        <span class="s1">teamFrame.setSize(</span><span class="s2">900</span><span class="s1">, </span><span class="s2">700</span><span class="s1">);</span>
+        <span class="s1">teamFrame.setLayout(</span><span class="s0">new </span><span class="s1">BorderLayout());</span>
+
+        <span class="s1">JLabel instructionLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Geben Sie den Namen und das Team ein:&quot;</span><span class="s1">, JLabel.CENTER);</span>
+        <span class="s1">instructionLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">24</span><span class="s1">));</span>
+        <span class="s1">instructionLabel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">0</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">0</span><span class="s1">));</span>
+        <span class="s1">teamFrame.add(instructionLabel, BorderLayout.NORTH);</span>
+
+        <span class="s1">JPanel inputPanel = </span><span class="s0">new </span><span class="s1">JPanel(</span><span class="s0">new </span><span class="s1">GridLayout(</span><span class="s2">2</span><span class="s1">, </span><span class="s2">2</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">10</span><span class="s1">));</span>
+        <span class="s1">inputPanel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">50</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">50</span><span class="s1">));</span>
+
+        <span class="s1">JLabel nameLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Spielername:&quot;</span><span class="s1">, JLabel.RIGHT);</span>
+        <span class="s1">nameLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">inputPanel.add(nameLabel);</span>
+
+        <span class="s1">JTextField playerNameField = </span><span class="s0">new </span><span class="s1">JTextField();</span>
+        <span class="s1">playerNameField.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.PLAIN, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">inputPanel.add(playerNameField);</span>
+
+        <span class="s1">JLabel teamLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Team:&quot;</span><span class="s1">, JLabel.RIGHT);</span>
+        <span class="s1">teamLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">inputPanel.add(teamLabel);</span>
+
+        <span class="s1">JComboBox&lt;String&gt; teamSelector = </span><span class="s0">new </span><span class="s1">JComboBox&lt;&gt;(</span><span class="s0">new </span><span class="s1">String[]{</span><span class="s3">&quot;Team 1&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 2&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 3&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 4&quot;</span><span class="s1">});</span>
+        <span class="s1">teamSelector.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.PLAIN, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">inputPanel.add(teamSelector);</span>
+
+        <span class="s1">JTextArea playerList = </span><span class="s0">new </span><span class="s1">JTextArea();</span>
+        <span class="s1">playerList.setEditable(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">playerList.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.PLAIN, </span><span class="s2">18</span><span class="s1">));</span>
+        <span class="s1">playerList.setBorder(BorderFactory.createLineBorder(Color.ORANGE, </span><span class="s2">2</span><span class="s1">));</span>
+        <span class="s1">JScrollPane scrollPane = </span><span class="s0">new </span><span class="s1">JScrollPane(playerList);</span>
+        <span class="s1">scrollPane.setBorder(BorderFactory.createTitledBorder(</span><span class="s3">&quot;Spielerliste&quot;</span><span class="s1">));</span>
+
+        <span class="s1">JButton addButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Hinzufügen&quot;</span><span class="s1">);</span>
+        <span class="s1">addButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">addButton.setBackground(Color.ORANGE);</span>
+        <span class="s1">addButton.setForeground(Color.BLACK);</span>
+        <span class="s1">addButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">addButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">addButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s1">String playerName = playerNameField.getText().trim();</span>
+                <span class="s1">String team = (String) teamSelector.getSelectedItem();</span>
+
+                <span class="s0">if </span><span class="s1">(!playerName.isEmpty()) {</span>
+                    <span class="s1">players.add(playerName);</span>
+                    <span class="s1">teams.add(team);</span>
+                    <span class="s1">playerPoints.put(playerName, </span><span class="s2">0</span><span class="s1">);</span>
+                    <span class="s1">teamPoints.put(team, teamPoints.getOrDefault(team, </span><span class="s2">0</span><span class="s1">));</span>
+                    <span class="s1">playerList.append(playerName + </span><span class="s3">&quot; - &quot; </span><span class="s1">+ team + </span><span class="s3">&quot;</span><span class="s4">\n</span><span class="s3">&quot;</span><span class="s1">);</span>
+                    <span class="s1">playerNameField.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">);</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">JOptionPane.showMessageDialog(teamFrame, </span><span class="s3">&quot;Bitte geben Sie einen Spielernamen ein.&quot;</span><span class="s1">, </span><span class="s3">&quot;Fehler&quot;</span><span class="s1">, JOptionPane.ERROR_MESSAGE);</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+
+        <span class="s1">JButton weiterButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Weiter&quot;</span><span class="s1">);</span>
+        <span class="s1">weiterButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">weiterButton.setBackground(Color.ORANGE);</span>
+        <span class="s1">weiterButton.setForeground(Color.BLACK);</span>
+        <span class="s1">weiterButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">weiterButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">weiterButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s0">if </span><span class="s1">(players.isEmpty()) {</span>
+                    <span class="s1">JOptionPane.showMessageDialog(teamFrame, </span><span class="s3">&quot;Bitte fügen Sie mindestens einen Spieler hinzu.&quot;</span><span class="s1">, </span><span class="s3">&quot;Fehler&quot;</span><span class="s1">, JOptionPane.ERROR_MESSAGE);</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">teamFrame.dispose();</span>
+                    <span class="s1">openCategorySelection();</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+
+        <span class="s1">JPanel buttonPanel = </span><span class="s0">new </span><span class="s1">JPanel(</span><span class="s0">new </span><span class="s1">FlowLayout());</span>
+        <span class="s1">buttonPanel.add(addButton);</span>
+        <span class="s1">buttonPanel.add(weiterButton);</span>
+
+        <span class="s1">teamFrame.add(inputPanel, BorderLayout.NORTH);</span>
+        <span class="s1">teamFrame.add(scrollPane, BorderLayout.CENTER);</span>
+        <span class="s1">teamFrame.add(buttonPanel, BorderLayout.SOUTH);</span>
+        <span class="s1">teamFrame.setVisible(</span><span class="s0">true</span><span class="s1">);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">openCategorySelection() {</span>
+        <span class="s1">JFrame categoryFrame = </span><span class="s0">new </span><span class="s1">JFrame(</span><span class="s3">&quot;Kategorie auswählen&quot;</span><span class="s1">);</span>
+        <span class="s1">categoryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+        <span class="s1">categoryFrame.setSize(</span><span class="s2">900</span><span class="s1">, </span><span class="s2">700</span><span class="s1">);</span>
+        <span class="s1">categoryFrame.setLayout(</span><span class="s0">new </span><span class="s1">BorderLayout());</span>
+
+        <span class="s1">JPanel pointsPanel = </span><span class="s0">new </span><span class="s1">JPanel(</span><span class="s0">new </span><span class="s1">GridLayout(</span><span class="s2">2</span><span class="s1">, </span><span class="s2">2</span><span class="s1">));</span>
+        <span class="s1">pointsPanel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+
+        <span class="s0">for </span><span class="s1">(String team : </span><span class="s0">new </span><span class="s1">String[]{</span><span class="s3">&quot;Team 1&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 2&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 3&quot;</span><span class="s1">, </span><span class="s3">&quot;Team 4&quot;</span><span class="s1">}) {</span>
+            <span class="s1">JTextArea teamInfo = </span><span class="s0">new </span><span class="s1">JTextArea();</span>
+            <span class="s1">teamInfo.setEditable(</span><span class="s0">false</span><span class="s1">);</span>
+            <span class="s1">teamInfo.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.PLAIN, </span><span class="s2">18</span><span class="s1">));</span>
+            <span class="s1">teamInfo.append(team + </span><span class="s3">&quot; - Punkte: &quot; </span><span class="s1">+ teamPoints.getOrDefault(team, </span><span class="s2">0</span><span class="s1">) + </span><span class="s3">&quot;</span><span class="s4">\n</span><span class="s3">&quot;</span><span class="s1">);</span>
+            <span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s2">0</span><span class="s1">; i &lt; players.size(); i++) {</span>
+                <span class="s0">if </span><span class="s1">(teams.get(i).equals(team)) {</span>
+                    <span class="s1">teamInfo.append(players.get(i) + </span><span class="s3">&quot; - Punkte: &quot; </span><span class="s1">+ playerPoints.get(players.get(i)) + </span><span class="s3">&quot;</span><span class="s4">\n</span><span class="s3">&quot;</span><span class="s1">);</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s1">JScrollPane scrollPane = </span><span class="s0">new </span><span class="s1">JScrollPane(teamInfo);</span>
+            <span class="s1">scrollPane.setBorder(BorderFactory.createTitledBorder(team));</span>
+            <span class="s1">pointsPanel.add(scrollPane);</span>
+        <span class="s1">}</span>
+
+        <span class="s1">categoryFrame.add(pointsPanel, BorderLayout.NORTH);</span>
+
+        <span class="s1">JLabel instructionLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Wählen Sie eine Kategorie aus (Spieler: &quot; </span><span class="s1">+ players.get(currentPlayerIndex) + </span><span class="s3">&quot;):&quot;</span><span class="s1">, JLabel.CENTER);</span>
+        <span class="s1">instructionLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">24</span><span class="s1">));</span>
+        <span class="s1">categoryFrame.add(instructionLabel, BorderLayout.CENTER);</span>
+
+        <span class="s1">JPanel categoryPanel = </span><span class="s0">new </span><span class="s1">JPanel();</span>
+        <span class="s1">categoryPanel.setLayout(</span><span class="s0">new </span><span class="s1">GridLayout(</span><span class="s2">2</span><span class="s1">, </span><span class="s2">2</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">10</span><span class="s1">));</span>
+
+        <span class="s1">String[] categories = {</span><span class="s3">&quot;Quiz&quot;</span><span class="s1">, </span><span class="s3">&quot;Aufgabe&quot;</span><span class="s1">, </span><span class="s3">&quot;Team Challenge&quot;</span><span class="s1">, </span><span class="s3">&quot;Duell&quot;</span><span class="s1">};</span>
+        <span class="s0">for </span><span class="s1">(String category : categories) {</span>
+            <span class="s1">JButton categoryButton = </span><span class="s0">new </span><span class="s1">JButton(category);</span>
+            <span class="s1">categoryButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+            <span class="s1">categoryButton.setBackground(Color.ORANGE);</span>
+            <span class="s1">categoryButton.setForeground(Color.BLACK);</span>
+            <span class="s1">categoryButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+            <span class="s1">categoryButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+            <span class="s1">categoryButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+                <span class="s1">@Override</span>
+                <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                    <span class="s1">categoryFrame.dispose();</span>
+                    <span class="s1">showTaskOrQuestion(category);</span>
+                <span class="s1">}</span>
+            <span class="s1">});</span>
+            <span class="s1">categoryPanel.add(categoryButton);</span>
+        <span class="s1">}</span>
+
+        <span class="s1">categoryFrame.add(categoryPanel, BorderLayout.SOUTH);</span>
+        <span class="s1">categoryFrame.setVisible(</span><span class="s0">true</span><span class="s1">);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">showTaskOrQuestion(String category) {</span>
+        <span class="s1">JFrame taskFrame = </span><span class="s0">new </span><span class="s1">JFrame(category);</span>
+        <span class="s1">taskFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+        <span class="s1">taskFrame.setSize(</span><span class="s2">900</span><span class="s1">, </span><span class="s2">700</span><span class="s1">);</span>
+        <span class="s1">taskFrame.setLayout(</span><span class="s0">new </span><span class="s1">BorderLayout());</span>
+
+        <span class="s1">List&lt;Question&gt; questions = categoryQuestions.get(category);</span>
+        <span class="s1">Question selectedQuestion = questions != </span><span class="s0">null </span><span class="s1">&amp;&amp; !questions.isEmpty() ?</span>
+                <span class="s1">questions.get(</span><span class="s0">new </span><span class="s1">Random().nextInt(questions.size())) :</span>
+                <span class="s0">new </span><span class="s1">Question(</span><span class="s3">&quot;Keine Fragen verfügbar&quot;</span><span class="s1">, </span><span class="s3">&quot;N/A&quot;</span><span class="s1">);</span>
+
+        <span class="s1">JLabel taskLabel = </span><span class="s0">new </span><span class="s1">JLabel(</span><span class="s3">&quot;Frage: &quot; </span><span class="s1">+ selectedQuestion.getQuestion(), JLabel.CENTER);</span>
+        <span class="s1">taskLabel.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">24</span><span class="s1">));</span>
+        <span class="s1">taskLabel.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">taskFrame.add(taskLabel, BorderLayout.CENTER);</span>
+
+        <span class="s1">JPanel buttonPanel = </span><span class="s0">new </span><span class="s1">JPanel();</span>
+
+        <span class="s1">JButton showAnswerButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Lösung anzeigen&quot;</span><span class="s1">);</span>
+        <span class="s1">showAnswerButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">showAnswerButton.setBackground(Color.BLUE);</span>
+        <span class="s1">showAnswerButton.setForeground(Color.WHITE);</span>
+        <span class="s1">showAnswerButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">showAnswerButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">showAnswerButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s1">JOptionPane.showMessageDialog(taskFrame, </span><span class="s3">&quot;Lösung: &quot; </span><span class="s1">+ selectedQuestion.getAnswer(), </span><span class="s3">&quot;Lösung&quot;</span><span class="s1">, JOptionPane.INFORMATION_MESSAGE);</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+
+        <span class="s1">JButton correctButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Richtig&quot;</span><span class="s1">);</span>
+        <span class="s1">correctButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">correctButton.setBackground(Color.GREEN);</span>
+        <span class="s1">correctButton.setForeground(Color.BLACK);</span>
+        <span class="s1">correctButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">correctButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">correctButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s0">int </span><span class="s1">points = </span><span class="s2">50</span><span class="s1">;</span>
+                <span class="s1">String currentPlayer = players.get(currentPlayerIndex);</span>
+                <span class="s1">playerPoints.put(currentPlayer, playerPoints.get(currentPlayer) + points);</span>
+                <span class="s1">String team = teams.get(currentPlayerIndex);</span>
+                <span class="s1">teamPoints.put(team, teamPoints.get(team) + points);</span>
+                <span class="s1">JOptionPane.showMessageDialog(taskFrame, currentPlayer + </span><span class="s3">&quot; hat &quot; </span><span class="s1">+ points + </span><span class="s3">&quot; Punkte gewonnen!&quot;</span><span class="s1">);</span>
+                <span class="s1">currentPlayerIndex = (currentPlayerIndex + </span><span class="s2">1</span><span class="s1">) % players.size();</span>
+                <span class="s1">taskFrame.dispose();</span>
+                <span class="s1">openCategorySelection();</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+
+        <span class="s1">JButton wrongButton = </span><span class="s0">new </span><span class="s1">JButton(</span><span class="s3">&quot;Falsch&quot;</span><span class="s1">);</span>
+        <span class="s1">wrongButton.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;SansSerif&quot;</span><span class="s1">, Font.BOLD, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">wrongButton.setBackground(Color.RED);</span>
+        <span class="s1">wrongButton.setForeground(Color.BLACK);</span>
+        <span class="s1">wrongButton.setFocusPainted(</span><span class="s0">false</span><span class="s1">);</span>
+        <span class="s1">wrongButton.setBorder(</span><span class="s0">new </span><span class="s1">EmptyBorder(</span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">, </span><span class="s2">10</span><span class="s1">, </span><span class="s2">20</span><span class="s1">));</span>
+        <span class="s1">wrongButton.addActionListener(</span><span class="s0">new </span><span class="s1">ActionListener() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+                <span class="s0">int </span><span class="s1">points = -</span><span class="s2">50</span><span class="s1">;</span>
+                <span class="s1">String currentPlayer = players.get(currentPlayerIndex);</span>
+                <span class="s1">playerPoints.put(currentPlayer, playerPoints.get(currentPlayer) + points);</span>
+                <span class="s1">String team = teams.get(currentPlayerIndex);</span>
+                <span class="s1">teamPoints.put(team, teamPoints.get(team) + points);</span>
+                <span class="s1">JOptionPane.showMessageDialog(taskFrame, currentPlayer + </span><span class="s3">&quot; hat &quot; </span><span class="s1">+ points + </span><span class="s3">&quot; Punkte verloren.&quot;</span><span class="s1">);</span>
+                <span class="s1">currentPlayerIndex = (currentPlayerIndex + </span><span class="s2">1</span><span class="s1">) % players.size();</span>
+                <span class="s1">taskFrame.dispose();</span>
+                <span class="s1">openCategorySelection();</span>
+            <span class="s1">}</span>
+        <span class="s1">});</span>
+
+        <span class="s1">buttonPanel.add(showAnswerButton);</span>
+        <span class="s1">buttonPanel.add(correctButton);</span>
+        <span class="s1">buttonPanel.add(wrongButton);</span>
+        <span class="s1">taskFrame.add(buttonPanel, BorderLayout.SOUTH);</span>
+
+        <span class="s1">taskFrame.setVisible(</span><span class="s0">true</span><span class="s1">);</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+
+<span class="s0">class </span><span class="s1">Question {</span>
+    <span class="s0">private </span><span class="s1">String question;</span>
+    <span class="s0">private </span><span class="s1">String answer;</span>
+
+    <span class="s0">public </span><span class="s1">Question(String question, String answer) {</span>
+        <span class="s0">this</span><span class="s1">.question = question;</span>
+        <span class="s0">this</span><span class="s1">.answer = answer;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getQuestion() {</span>
+        <span class="s0">return </span><span class="s1">question;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getAnswer() {</span>
+        <span class="s0">return </span><span class="s1">answer;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
